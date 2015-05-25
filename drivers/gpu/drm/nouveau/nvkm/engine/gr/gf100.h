@@ -36,6 +36,7 @@
 #define GPC_UNIT(t, r)    (0x500000 + (t) * 0x8000 + (r))
 #define PPC_UNIT(t, m, r) (0x503000 + (t) * 0x8000 + (m) * 0x200 + (r))
 #define TPC_UNIT(t, m, r) (0x504000 + (t) * 0x8000 + (m) * 0x800 + (r))
+#define MP_UNIT(t, m, r)  (0x504000 + (t) * 0x8000 + (m) * 0x800 + 0x600 + (r))
 
 struct gf100_gr_data {
 	u32 size;

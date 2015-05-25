@@ -817,10 +817,16 @@ static const struct nvkm_bitfield gf100_mp_global_error[] = {
 static void
 gf100_gr_trap_mp(struct gf100_gr_priv *priv, int gpc, int tpc)
 {
+	/* completion for interrupt */
+	nv_wr32(priv, TPC_UNIT(gpc, tpc, 0x508), 0xf);
+	/* warp error */
 	u32 werr = nv_rd32(priv, TPC_UNIT(gpc, tpc, 0x648));
+	/* global error */
 	u32 gerr = nv_rd32(priv, TPC_UNIT(gpc, tpc, 0x650));
 
-	nv_error(priv, "GPC%i/TPC%i/MP trap:", gpc, tpc);
+	u32 bpt_status = nv_rd32(priv, MP_UNIT(gpc, tpc, 0x0c));
+
+	nv_error(priv, "GPC%i/TPC%i/MP BPT:(%08x) trap:", gpc, tpc, bpt_status);
 	nvkm_bitfield_print(gf100_mp_global_error, gerr);
 	if (werr) {
 		pr_cont(" ");
@@ -828,14 +834,26 @@ gf100_gr_trap_mp(struct gf100_gr_priv *priv, int gpc, int tpc)
 	}
 	pr_cont("\n");
 
+#if 0
 	nv_wr32(priv, TPC_UNIT(gpc, tpc, 0x648), 0x00000000);
 	nv_wr32(priv, TPC_UNIT(gpc, tpc, 0x650), gerr);
+#endif
+
+	/* Drain all active warps. */
+	nv_warn(priv, "Draining is start.\n");
+	while (
+		nv_rd32(priv, MP_UNIT(gpc, tpc, 0x24)) != nv_rd32(priv, MP_UNIT(gpc, tpc, 0x14)) &&
+		nv_rd32(priv, MP_UNIT(gpc, tpc, 0x28)) != nv_rd32(priv, MP_UNIT(gpc, tpc, 0x18))
+	);
+	nv_warn(priv, "Draining is done. MP is now paused\n");
 }
 
 static void
 gf100_gr_trap_tpc(struct gf100_gr_priv *priv, int gpc, int tpc)
 {
 	u32 stat = nv_rd32(priv, TPC_UNIT(gpc, tpc, 0x0508));
+	u32 bpt_status = nv_rd32(priv, MP_UNIT(gpc, tpc, 0x0c));
+	nv_error(priv, "??GPC%i/TPC%i/MP BPT:(%08x) trap:", gpc, tpc, bpt_status);
 
 	if (stat & 0x00000001) {
 		u32 trap = nv_rd32(priv, TPC_UNIT(gpc, tpc, 0x0224));

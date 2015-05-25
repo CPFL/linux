@@ -371,6 +371,26 @@ ctx_xfer:
 	ctx_xfer_post:
 		call(strand_post)
 
+	// per-TPC bpt control
+	ld b32 $r11 D[$r0 + #tpc_count]
+	clear b32 $r13
+	tpc_debugging_loop:
+		// set up the per-TPC bpt register address
+		imm32($r14, 0x504000)
+		ld b32 $r12 D[$r0 + #gpc_id]
+		shl b32 $r12 15
+		add b32 $r14 $r12
+		mov b32 $r12 $r13
+		shl b32 $r12 11
+		add b32 $r14 $r12
+		add b32 $r14 0x610
+		imm32($r15, 0x1)
+		call(nv_wr32)
+
+		add b32 $r13 1
+		cmp b32 $r13 $r11
+		bra ne #tpc_debugging_loop
+
 	// mark completion in HUB's barrier
 	ctx_xfer_done:
 	call(hub_barrier_done)

@@ -660,7 +660,7 @@ gf100_fifo_intr_fault(struct gf100_fifo_priv *priv, int unit)
 	while (object) {
 		switch (nv_mclass(object)) {
 		case FERMI_CHANNEL_GPFIFO:
-			gf100_fifo_recover(priv, engine, (void *)object);
+			/* gf100_fifo_recover(priv, engine, (void *)object); */
 			break;
 		}
 		object = object->parent;

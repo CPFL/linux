@@ -844,7 +844,9 @@ gf100_gr_trap_mp(struct gf100_gr_priv *priv, int gpc, int tpc)
 	u32 active1 = nv_rd32(priv, MP_UNIT(gpc, tpc, 0x18));
 	u32 init0 = nv_rd32(priv, MP_UNIT(gpc, tpc, 0x24));
 	u32 init1 = nv_rd32(priv, MP_UNIT(gpc, tpc, 0x28));
-	nv_warn(priv, "Draining is start 0x%08x/0x%08x/0x%08x/0x%08x.\n", active0, active1, init0, init1);
+	u32 trap0 = nv_rd32(priv, MP_UNIT(gpc, tpc, 0x34));
+	u32 trap1 = nv_rd32(priv, MP_UNIT(gpc, tpc, 0x38));
+	nv_warn(priv, "Draining is start 0x%08x/0x%08x/0x%08x/0x%08x/0x%08x/0x%08x.\n", active0, active1, init0, init1, trap0, trap1);
 	nv_wait(priv, MP_UNIT(gpc, tpc, 0x24), 0xffffffff, active0);
 	nv_wait(priv, MP_UNIT(gpc, tpc, 0x28), 0xffffffff, active1);
 	nv_warn(priv, "Draining is done. MP is now paused\n");

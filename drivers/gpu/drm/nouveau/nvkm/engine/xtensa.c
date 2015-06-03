@@ -128,7 +128,7 @@ _nvkm_xtensa_init(struct nvkm_object *object)
 			return ret;
 		}
 
-		nv_debug(xtensa, "Loading firmware to address: 0x%llx\n",
+		nv_error(xtensa, "Loading firmware to address: 0x%llx\n",
 			 xtensa->gpu_fw->addr);
 
 		for (i = 0; i < fw->size / 4; i++)

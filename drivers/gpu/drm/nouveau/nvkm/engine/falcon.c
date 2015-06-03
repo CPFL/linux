@@ -32,7 +32,7 @@ nvkm_falcon_intr(struct nvkm_subdev *subdev)
 	u32 intr = nv_ro32(falcon, 0x008) & dispatch & ~(dispatch >> 16);
 
 	if (intr & 0x00000010) {
-		nv_debug(falcon, "ucode halted\n");
+		nv_error(falcon, "ucode halted\n");
 		nv_wo32(falcon, 0x004, 0x00000010);
 		intr &= ~0x00000010;
 	}
@@ -96,10 +96,10 @@ _nvkm_falcon_init(struct nvkm_object *object)
 	falcon->code.limit = (caps & 0x000001ff) << 8;
 	falcon->data.limit = (caps & 0x0003fe00) >> 1;
 
-	nv_debug(falcon, "falcon version: %d\n", falcon->version);
-	nv_debug(falcon, "secret level: %d\n", falcon->secret);
-	nv_debug(falcon, "code limit: %d\n", falcon->code.limit);
-	nv_debug(falcon, "data limit: %d\n", falcon->data.limit);
+	nv_error(falcon, "falcon version: %d\n", falcon->version);
+	nv_error(falcon, "secret level: %d\n", falcon->secret);
+	nv_error(falcon, "code limit: %d\n", falcon->code.limit);
+	nv_error(falcon, "data limit: %d\n", falcon->data.limit);
 
 	/* wait for 'uc halted' to be signalled before continuing */
 	if (falcon->secret && falcon->version < 4) {
@@ -167,8 +167,8 @@ _nvkm_falcon_init(struct nvkm_object *object)
 			return -ENOMEM;
 	}
 
-	nv_debug(falcon, "firmware: %s (%s)\n", name, falcon->data.data ?
-		 "static code/data segments" : "self-bootstrapping");
+	nv_error(falcon, "firmware: %s (%s) : nouveau/nv%02x_fuc%03xc\n", name, falcon->data.data ?
+		 "static code/data segments" : "self-bootstrapping", device->chipset, falcon->addr >> 12);
 
 	/* ensure any "self-bootstrapping" firmware image is in vram */
 	if (!falcon->data.data && !falcon->core) {

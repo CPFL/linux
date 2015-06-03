@@ -1592,6 +1592,7 @@ gf100_gr_ctor(struct nvkm_object *parent, struct nvkm_object *engine,
 		    gf100_gr_ctor_fw(priv, "fuc41ad", &priv->fuc41ad))
 			return -ENODEV;
 		priv->firmware = true;
+		nv_info(priv, "external firmware is ok\n");
 	}
 
 	ret = nvkm_gpuobj_new(nv_object(priv), NULL, 0x1000, 256, 0,

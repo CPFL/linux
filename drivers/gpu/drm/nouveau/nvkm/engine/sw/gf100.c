@@ -57,10 +57,16 @@ gf100_sw_mthd_mp_control(struct nvkm_object *object, u32 mthd,
 	case 0x600:
 		nv_wr32(priv, 0x419e00, data); /* MP.PM_UNK000 */
 		break;
+	case 0x610:
+		nv_wr32(priv, 0x419e10, data); /* MP.BPT_CONTROL */
+		break;
 	case 0x644:
 		if (data & ~0x1ffffe)
 			return -EINVAL;
 		nv_wr32(priv, 0x419e44, data); /* MP.TRAP_WARP_ERROR_EN */
+		break;
+	case 0x658:
+		nv_wr32(priv, 0x419e58, data); /* MP.TRAP_HANDLER_PC */
 		break;
 	case 0x6ac:
 		nv_wr32(priv, 0x419eac, data); /* MP.PM_UNK0AC */
@@ -79,7 +85,9 @@ gf100_sw_omthds[] = {
 	{ 0x040c, 0x040c, nv50_sw_mthd_vblsem_release },
 	{ 0x0500, 0x0500, nv50_sw_mthd_flip },
 	{ 0x0600, 0x0600, gf100_sw_mthd_mp_control },
+	{ 0x0610, 0x0610, gf100_sw_mthd_mp_control },
 	{ 0x0644, 0x0644, gf100_sw_mthd_mp_control },
+	{ 0x0658, 0x0658, gf100_sw_mthd_mp_control },
 	{ 0x06ac, 0x06ac, gf100_sw_mthd_mp_control },
 	{}
 };

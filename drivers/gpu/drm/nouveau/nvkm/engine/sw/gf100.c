@@ -53,21 +53,49 @@ gf100_sw_mthd_mp_control(struct nvkm_object *object, u32 mthd,
 	struct nv50_sw_priv *priv = (void *)nv_object(chan)->engine;
 	u32 data = *(u32 *)args;
 
+	nv_error(priv, "method call %x:%x\n", (unsigned)mthd, (unsigned)data);
+
 	switch (mthd) {
 	case 0x600:
 		nv_wr32(priv, 0x419e00, data); /* MP.PM_UNK000 */
 		break;
-	case 0x610:
+	case 0x610: {
+		unsigned i;
+		unsigned gpcs  = nv_rd32(priv, 0x409604) & 0xff;
 		nv_wr32(priv, 0x419e10, data); /* MP.BPT_CONTROL */
+		for (i = 0; i < gpcs; ++i) {
+			unsigned j;
+			unsigned gpc_base = 0x500000 + 0x8000 * i;
+			unsigned tpcs = nv_rd32(priv, 0x502608 + i * 0x8000) & 0xff;
+			for (j = 0; j < tpcs; ++j) {
+				unsigned tpc_base = gpc_base + 0x4000 + 0x800 * j;
+				unsigned mp_base = tpc_base + 0x600;
+				nv_wr32(priv, mp_base + 0x10, data);
+			}
+		}
 		break;
+	}
 	case 0x644:
 		if (data & ~0x1ffffe)
 			return -EINVAL;
 		nv_wr32(priv, 0x419e44, data); /* MP.TRAP_WARP_ERROR_EN */
 		break;
-	case 0x658:
+	case 0x658: {
+		unsigned i;
+		unsigned gpcs  = nv_rd32(priv, 0x409604) & 0xff;
 		nv_wr32(priv, 0x419e58, data); /* MP.TRAP_HANDLER_PC */
+		for (i = 0; i < gpcs; ++i) {
+			unsigned j;
+			unsigned gpc_base = 0x500000 + 0x8000 * i;
+			unsigned tpcs = nv_rd32(priv, 0x502608 + i * 0x8000) & 0xff;
+			for (j = 0; j < tpcs; ++j) {
+				unsigned tpc_base = gpc_base + 0x4000 + 0x800 * j;
+				unsigned mp_base = tpc_base + 0x600;
+				nv_wr32(priv, mp_base + 0x58, data);
+			}
+		}
 		break;
+	}
 	case 0x6ac:
 		nv_wr32(priv, 0x419eac, data); /* MP.PM_UNK0AC */
 		break;
